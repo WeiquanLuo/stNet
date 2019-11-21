@@ -26,15 +26,18 @@ The string elements have to be those destinaGroup generic methods such as min, m
 combine target and predictor data
 }
 \examples{
-data(weather_tmax_sf);
-data(corn_yield_sf);
-target_data <- spatio_fuse(target_stN = corn_yield_sf,
-                               data_stN = weather_tmax_sf,
+data(weather_tmin_sf)
+data(corn_yield_sf)
+corn_yield_st <- corn_yield_sf
+weather_tmin_st <- weather_tmin_sf
+target_data_t <- spatio_fuse(target_stN = corn_yield_st,
+                               data_stN = weather_tmin_st,
                                parm_nm = "tmax",
-                               crs = 2163); target_data
-target_data <- target_data \%>\%
+                               crs = 2163); target_data_t
+target_data <- target_data_t \%>\%
   nest(data = c(target, predictor)); target_data
-data <- target_data[which(target_data$county == "boone"), ]$data[[1]]; data # humboldt for none; allamakee for one; boone for two
+data <- target_data[which(target_data$county == "boone"), ]$data[[1]]; data
+# humboldt for none; allamakee for one; boone for two
 agg_cbind(data,
           date_col = c("Year", "Date"),
           scaling = c("Year","Day"),

@@ -14,12 +14,14 @@ a dataframe
 matching the site from data_stN to the by polygon in target_stN
 }
 \examples{
-data(weather_tmax_sf)
+data(weather_tmin_sf)
 data(corn_yield_sf)
+corn_yield_st <- corn_yield_sf
+weather_tmin_st <- weather_tmin_sf
 tictoc::tic()
-target_data_sf <- spatio_fuse(target_stN = corn_yield_sf,
-                               data_stN = weather_tmax_sf,
-                               parm_nm = "tmax",
-                               crs = 2163); target_data_sf
+target_data_t <- spatio_fuse(target_stN = corn_yield_st,
+                             data_stN = weather_tmin_st,
+                             parm_nm = "tmin",
+                             crs = 2163); target_data_t
 tictoc::toc()
 }
