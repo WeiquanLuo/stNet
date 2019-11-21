@@ -16,7 +16,7 @@ such as min, max, mean, etc.(see: ??dplyr::summarise)}
 rescaling the temporal resolution by method
 }
 \examples{
-data <- round(runif(n = 20, min = 0, max = 100))
+data <- c(NA,round(runif(n = 20, min = 0, max = 100)))
 rescallingMethod <- "max"
 temporal_rescaling(data= data, rescallingMethod = rescallingMethod)
 }

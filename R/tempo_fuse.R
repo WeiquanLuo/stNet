@@ -2,16 +2,20 @@
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
-#' data(weather_tmax_sf);
-#' data(corn_yield_sf);
-#' target_data <- spatio_fuse(target_stN = corn_yield_sf,
-#'                             data_stN = weather_tmax_sf,
-#'                             parm_nm = "tmax",
-#'                             crs = 4326); target_data
-#' target_data <- tempo_fuse(target_data = target_data,
+#' data(weather_tmin_sf)
+#' data(corn_yield_sf)
+#' corn_yield_st <- corn_yield_sf
+#' weather_tmin_st <- weather_tmin_sf
+#' tictoc::tic()
+#' target_data_t <- spatio_fuse(target_stN = corn_yield_st,
+#'                                data_stN = weather_tmin_st,
+#'                                parm_nm = "tmin",
+#'                                crs = 2163); target_data_t
+#' tictoc::toc()
+#' target_data <- tempo_fuse(target_data = target_data_t,
 #'                           date_col = c("Year", "Date"),
 #'                           scaling = c("Year","Month"),
-#'                           aggMethod = c("mean","max")); target_data
+#'                           aggMethod = c("mean","min")); target_data
 
 
 tempo_fuse <- function(target_data = NULL,
