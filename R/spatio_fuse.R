@@ -22,9 +22,8 @@
 
 spatio_fuse <- function(target_stN = NULL, data_stN = NULL, parm_nm = "parm_xxx", crs = 4326){
 
+  data_stN <- data_stN %>% select(id, data, geometry)
   # project to a appropriate project for correctly crop
-  if (crs(target_stN) != crs(data_stN)) return("raster::crs(target_stN) != raster::crs(data_stN)")
-  original_crs <- crs(target_stN)
   target_stN <- target_stN %>% st_transform(crs)
   data_stN <- data_stN %>% st_transform(crs)
 

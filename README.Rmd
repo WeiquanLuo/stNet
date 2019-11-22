@@ -42,26 +42,31 @@ This is a basic example which shows a workflow of using $stNet$ functionality:
 ```{r example}
 library(stNet)
 # load data
-data(weather_tmax_sf); weather_tmax_st <- weather_tmax_sf # point sf object
-data(weather_tmin_sf); weather_tmin_st <- weather_tmin_sf # point sf object
 data(corn_yield_sf); corn_yield_st <- corn_yield_sf # polygon sf object
+data(weather_tmin_sf); weather_tmin_st <- weather_tmin_sf # point sf object
+data(water_Temperature_sf); water_Temperature_st <- water_Temperature_sf # point sf object
+
+# Visualization the data
+plot(sf::st_geometry(corn_yield_st))
+plot(sf::st_geometry(weather_tmin_st), col = "blue", add = TRUE)
+plot(sf::st_geometry(water_Temperature_st), col = "red", add = TRUE)
 ```
 
 ### Step 1 fuse the spatio heterogeneity: `spatio_fuse()`
 
 ```{r spatio_fuse}
 yield_tmin_t <- spatio_fuse(target_stN = corn_yield_st,
-                               data_stN = weather_tmin_st,
-                               parm_nm = "tmin",
-                               crs = 2163)
+                            data_stN = weather_tmin_st,
+                            parm_nm = "tmin",
+                            crs = 2163)
 
-yield_tmax_t <- spatio_fuse(target_stN = corn_yield_st,
-                               data_stN = weather_tmax_st,
-                               parm_nm = "tmax",
-                               crs = 2163)
-yield_tmax_t
-yield_tmax_t$target[[1]]
-yield_tmax_t$predictor[[1]]
+yield_watertem_t <- spatio_fuse(target_stN = corn_yield_st,
+                                data_stN = water_Temperature_st,
+                                parm_nm = "watertem",
+                                crs = 2163)
+yield_watertem_t
+yield_watertem_t$target[[1]]
+yield_watertem_t$predictor[[1]]
 ```
 
 ### Step 2: fuse temporal heterogeneity: `tempo_fuse()`
@@ -72,12 +77,12 @@ yield_tmin <- tempo_fuse(target_data = yield_tmin_t,
                           scaling = c("Year","Month"),
                           aggMethod = c("mean","min"))
 
-yield_tmax <- tempo_fuse(target_data = yield_tmax_t,
+yield_watertem <- tempo_fuse(target_data = yield_watertem_t,
                           date_col = c("Year", "Date"),
                           scaling = c("Year","Month"),
                           aggMethod = c("mean","min"))
-yield_tmax
-yield_tmax$data[[1]]
+yield_watertem
+yield_watertem$data[[1]]
 ```
 
 ### Step 3: bind multiple homogeneous spatiotemporal data into a single object
@@ -86,7 +91,7 @@ If there multiple parameter for the same target varible, we can use `cbind_Targe
 
 ```{r cbind_TargetDatas}
 
-bind_data <- cbind_TargetDatas(yield_tmin, yield_tmax, 
+bind_data <- cbind_TargetDatas(yield_tmin, yield_watertem, 
                                target = "yield", join_by = "Year"); bind_data; bind_data$data[[1]]
 ```
 

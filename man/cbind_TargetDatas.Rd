@@ -10,6 +10,6 @@ cbind_TargetDatas(target = NULL, join_by = NULL, ...)
 bind multiple stN class object
 }
 \examples{
-x <- list(yield_prcp, yield_tmin, yield_tmax)
+x <- list(yield_tmin, yield_watertem)
 cbind_TargetDatas(x, target = "yield", join_by = "Year")
 }

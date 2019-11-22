@@ -37,69 +37,80 @@ functionality:
 ``` r
 library(stNet)
 # load data
-data(weather_tmax_sf); weather_tmax_st <- weather_tmax_sf # point sf object
-data(weather_tmin_sf); weather_tmin_st <- weather_tmin_sf # point sf object
 data(corn_yield_sf); corn_yield_st <- corn_yield_sf # polygon sf object
+data(weather_tmin_sf); weather_tmin_st <- weather_tmin_sf # point sf object
+data(water_Temperature_sf); water_Temperature_st <- water_Temperature_sf # point sf object
+
+# Visualization the data
+plot(sf::st_geometry(corn_yield_st))
+plot(sf::st_geometry(weather_tmin_st), col = "blue", add = TRUE)
+plot(sf::st_geometry(water_Temperature_st), col = "red", add = TRUE)
 ```
+
+<img src="man/figures/README-example-1.png" width="100%" />
 
 ### Step 1 fuse the spatio heterogeneity: `spatio_fuse()`
 
 ``` r
 yield_tmin_t <- spatio_fuse(target_stN = corn_yield_st,
-                               data_stN = weather_tmin_st,
-                               parm_nm = "tmin",
-                               crs = 2163)
+                            data_stN = weather_tmin_st,
+                            parm_nm = "tmin",
+                            crs = 2163)
 #> Linking to GEOS 3.7.2, GDAL 2.4.2, PROJ 5.2.0
 
-yield_tmax_t <- spatio_fuse(target_stN = corn_yield_st,
-                               data_stN = weather_tmax_st,
-                               parm_nm = "tmax",
-                               crs = 2163)
-yield_tmax_t
-#> # A tibble: 89 x 3
-#>    county             target predictor            
-#>    <chr>      <list<df[,2]>> <list>               
-#>  1 adair            [39 × 2] <tibble [14,245 × 2]>
-#>  2 adams            [39 × 2] <tibble [12,805 × 2]>
-#>  3 allamakee        [39 × 2] <tibble [10,641 × 2]>
-#>  4 appanoose        [38 × 2] <tibble [14,113 × 3]>
-#>  5 audubon          [39 × 2] <tibble [14,101 × 2]>
-#>  6 benton           [39 × 2] <tibble [14,245 × 3]>
-#>  7 blackhawk        [39 × 2] <tibble [14,245 × 2]>
-#>  8 boone            [39 × 2] <tibble [14,245 × 3]>
-#>  9 bremer           [39 × 2] <tibble [13,146 × 2]>
-#> 10 buenavista       [39 × 2] <tibble [14,245 × 3]>
-#> # … with 79 more rows
-yield_tmax_t$target[[1]]
+yield_watertem_t <- spatio_fuse(target_stN = corn_yield_st,
+                                data_stN = water_Temperature_st,
+                                parm_nm = "watertem",
+                                crs = 2163)
+yield_watertem_t
+#> # A tibble: 15 x 3
+#>    county                target predictor           
+#>    <chr>         <list<df[,2]>> <list>              
+#>  1 bremer              [39 × 2] <tibble [2,582 × 2]>
+#>  2 clayton             [39 × 2] <tibble [1,386 × 2]>
+#>  3 clinton             [39 × 2] <tibble [2,215 × 2]>
+#>  4 dallas              [39 × 2] <tibble [2,389 × 3]>
+#>  5 dickinson           [39 × 2] <tibble [2,648 × 3]>
+#>  6 fremont             [39 × 2] <tibble [1,035 × 2]>
+#>  7 greene              [39 × 2] <tibble [2,298 × 2]>
+#>  8 hamilton            [39 × 2] <tibble [2,339 × 2]>
+#>  9 linn                [39 × 2] <tibble [1,739 × 2]>
+#> 10 marion              [39 × 2] <tibble [2,544 × 2]>
+#> 11 page                [39 × 2] <tibble [2,269 × 2]>
+#> 12 polk                [39 × 2] <tibble [1,921 × 2]>
+#> 13 pottawattamie       [38 × 2] <tibble [3,264 × 2]>
+#> 14 sac                 [39 × 2] <tibble [2,345 × 2]>
+#> 15 woodbury            [39 × 2] <tibble [2,611 × 2]>
+yield_watertem_t$target[[1]]
 #> # A tibble: 39 x 2
 #>     Year yield
 #>    <int> <dbl>
-#>  1  2018  149.
-#>  2  2017  175.
-#>  3  2016  190.
-#>  4  2015  176.
-#>  5  2014  169.
-#>  6  2013  138.
-#>  7  2012  104.
-#>  8  2011  153.
-#>  9  2010  139.
-#> 10  2009  179.
+#>  1  2018  212.
+#>  2  2017  213.
+#>  3  2016  211.
+#>  4  2015  203.
+#>  5  2014  159 
+#>  6  2013  175.
+#>  7  2012  133.
+#>  8  2011  196.
+#>  9  2010  175.
+#> 10  2009  189.
 #> # … with 29 more rows
-yield_tmax_t$predictor[[1]]
-#> # A tibble: 14,245 x 2
-#>    Date       tmax_USC00133438
-#>    <date>                <dbl>
-#>  1 1980-01-01                0
-#>  2 1980-01-02              -11
-#>  3 1980-01-03              -22
-#>  4 1980-01-04              -17
-#>  5 1980-01-05                0
-#>  6 1980-01-06               -6
-#>  7 1980-01-07              -78
-#>  8 1980-01-08              -83
-#>  9 1980-01-09              -78
-#> 10 1980-01-10               78
-#> # … with 14,235 more rows
+yield_watertem_t$predictor[[1]]
+#> # A tibble: 2,582 x 2
+#>    Date       watertem_05458300
+#>    <date>                 <dbl>
+#>  1 2011-10-01              13.5
+#>  2 2011-10-02              12.9
+#>  3 2011-10-03              13.7
+#>  4 2011-10-04              14.6
+#>  5 2011-10-05              15.5
+#>  6 2011-10-06              16.1
+#>  7 2011-10-07              16.5
+#>  8 2011-10-08              17.2
+#>  9 2011-10-09              17.5
+#> 10 2011-10-10              16.8
+#> # … with 2,572 more rows
 ```
 
 ### Step 2: fuse temporal heterogeneity: `tempo_fuse()`
@@ -110,44 +121,48 @@ yield_tmin <- tempo_fuse(target_data = yield_tmin_t,
                           scaling = c("Year","Month"),
                           aggMethod = c("mean","min"))
 
-yield_tmax <- tempo_fuse(target_data = yield_tmax_t,
+yield_watertem <- tempo_fuse(target_data = yield_watertem_t,
                           date_col = c("Year", "Date"),
                           scaling = c("Year","Month"),
                           aggMethod = c("mean","min"))
-yield_tmax
-#> # A tibble: 89 x 2
-#>    county     data              
-#>    <chr>      <list>            
-#>  1 adair      <tibble [39 × 14]>
-#>  2 adams      <tibble [39 × 14]>
-#>  3 allamakee  <tibble [39 × 14]>
-#>  4 appanoose  <tibble [38 × 26]>
-#>  5 audubon    <tibble [39 × 14]>
-#>  6 benton     <tibble [39 × 26]>
-#>  7 blackhawk  <tibble [39 × 14]>
-#>  8 boone      <tibble [39 × 26]>
-#>  9 bremer     <tibble [39 × 14]>
-#> 10 buenavista <tibble [39 × 26]>
-#> # … with 79 more rows
-yield_tmax$data[[1]]
+yield_watertem
+#> # A tibble: 15 x 2
+#>    county        data              
+#>    <chr>         <list>            
+#>  1 bremer        <tibble [39 × 14]>
+#>  2 clayton       <tibble [39 × 14]>
+#>  3 clinton       <tibble [39 × 14]>
+#>  4 dallas        <tibble [39 × 26]>
+#>  5 dickinson     <tibble [39 × 26]>
+#>  6 fremont       <tibble [39 × 14]>
+#>  7 greene        <tibble [39 × 14]>
+#>  8 hamilton      <tibble [39 × 14]>
+#>  9 linn          <tibble [39 × 14]>
+#> 10 marion        <tibble [39 × 14]>
+#> 11 page          <tibble [39 × 14]>
+#> 12 polk          <tibble [39 × 14]>
+#> 13 pottawattamie <tibble [38 × 14]>
+#> 14 sac           <tibble [39 × 14]>
+#> 15 woodbury      <tibble [39 × 14]>
+yield_watertem$data[[1]]
 #> # A tibble: 39 x 14
-#>     Year yield tmax_USC0013343… tmax_USC0013343… tmax_USC0013343…
+#>     Year yield watertem_054583… watertem_054583… watertem_054583…
 #>    <dbl> <dbl>            <dbl>            <dbl>            <dbl>
-#>  1  2018  149.             -200             -128              -22
-#>  2  2017  175.             -128              -83              -44
-#>  3  2016  190.             -167              -78              -44
-#>  4  2015  176.             -139             -133              -56
-#>  5  2014  169.             -189             -144             -150
-#>  6  2013  138.             -111             -133              -28
-#>  7  2012  104.             -133             -106                1
-#>  8  2011  153.             -133             -172                1
-#>  9  2010  139.             -183             -117                1
-#> 10  2009  179.             -211              -39              -56
-#> # … with 29 more rows, and 9 more variables: tmax_USC00133438_4 <dbl>,
-#> #   tmax_USC00133438_5 <dbl>, tmax_USC00133438_6 <dbl>,
-#> #   tmax_USC00133438_7 <dbl>, tmax_USC00133438_8 <dbl>,
-#> #   tmax_USC00133438_9 <dbl>, tmax_USC00133438_10 <dbl>,
-#> #   tmax_USC00133438_11 <dbl>, tmax_USC00133438_12 <dbl>
+#>  1  2018  212.                1              0.1             -0.1
+#>  2  2017  213.                1              1               -0.1
+#>  3  2016  211.                1              1               -0.2
+#>  4  2015  203.                1              1               -0.1
+#>  5  2014  159                 1             -0.1             -0.1
+#>  6  2013  175.                1              0               -0.1
+#>  7  2012  133.                1              0.7              0.5
+#>  8  2011  196.                1              1               -0.1
+#>  9  2010  175.               NA             NA               NA  
+#> 10  2009  189.               NA             NA               NA  
+#> # … with 29 more rows, and 9 more variables: watertem_05458300_1 <dbl>,
+#> #   watertem_05458300_2 <dbl>, watertem_05458300_3 <dbl>,
+#> #   watertem_05458300_4 <dbl>, watertem_05458300_5 <dbl>,
+#> #   watertem_05458300_6 <dbl>, watertem_05458300_7 <dbl>,
+#> #   watertem_05458300_8 <dbl>, watertem_05458300_9 <dbl>
 ```
 
 ### Step 3: bind multiple homogeneous spatiotemporal data into a single object
@@ -159,23 +174,23 @@ target varialbe `target = "yield"`:
 
 ``` r
 
-bind_data <- cbind_TargetDatas(yield_tmin, yield_tmax, 
+bind_data <- cbind_TargetDatas(yield_tmin, yield_watertem, 
                                target = "yield", join_by = "Year"); bind_data; bind_data$data[[1]]
-#> # A tibble: 89 x 2
+#> # A tibble: 90 x 2
 #>    county     data              
 #>    <chr>      <list>            
-#>  1 adair      <tibble [39 × 26]>
-#>  2 adams      <tibble [39 × 26]>
-#>  3 allamakee  <tibble [39 × 26]>
-#>  4 appanoose  <tibble [38 × 50]>
-#>  5 audubon    <tibble [39 × 26]>
-#>  6 benton     <tibble [39 × 50]>
-#>  7 blackhawk  <tibble [39 × 26]>
-#>  8 boone      <tibble [39 × 50]>
+#>  1 adair      <tibble [39 × 14]>
+#>  2 adams      <tibble [39 × 14]>
+#>  3 allamakee  <tibble [39 × 14]>
+#>  4 appanoose  <tibble [38 × 26]>
+#>  5 audubon    <tibble [39 × 14]>
+#>  6 benton     <tibble [39 × 26]>
+#>  7 blackhawk  <tibble [39 × 14]>
+#>  8 boone      <tibble [39 × 26]>
 #>  9 bremer     <tibble [39 × 26]>
-#> 10 buenavista <tibble [39 × 50]>
-#> # … with 79 more rows
-#> # A tibble: 39 x 26
+#> 10 buenavista <tibble [39 × 26]>
+#> # … with 80 more rows
+#> # A tibble: 39 x 14
 #>     Year yield tmin_USC0013343… tmin_USC0013343… tmin_USC0013343…
 #>    <dbl> <dbl>            <dbl>            <dbl>            <dbl>
 #>  1  2018  149.             -306             -211              -94
@@ -188,17 +203,11 @@ bind_data <- cbind_TargetDatas(yield_tmin, yield_tmax,
 #>  8  2011  153.             -206             -261             -133
 #>  9  2010  139.             -289             -267             -106
 #> 10  2009  179.             -289             -189             -161
-#> # … with 29 more rows, and 21 more variables: tmin_USC00133438_4 <dbl>,
+#> # … with 29 more rows, and 9 more variables: tmin_USC00133438_4 <dbl>,
 #> #   tmin_USC00133438_5 <dbl>, tmin_USC00133438_6 <dbl>,
 #> #   tmin_USC00133438_7 <dbl>, tmin_USC00133438_8 <dbl>,
 #> #   tmin_USC00133438_9 <dbl>, tmin_USC00133438_10 <dbl>,
-#> #   tmin_USC00133438_11 <dbl>, tmin_USC00133438_12 <dbl>,
-#> #   tmax_USC00133438_1 <dbl>, tmax_USC00133438_2 <dbl>,
-#> #   tmax_USC00133438_3 <dbl>, tmax_USC00133438_4 <dbl>,
-#> #   tmax_USC00133438_5 <dbl>, tmax_USC00133438_6 <dbl>,
-#> #   tmax_USC00133438_7 <dbl>, tmax_USC00133438_8 <dbl>,
-#> #   tmax_USC00133438_9 <dbl>, tmax_USC00133438_10 <dbl>,
-#> #   tmax_USC00133438_11 <dbl>, tmax_USC00133438_12 <dbl>
+#> #   tmin_USC00133438_11 <dbl>, tmin_USC00133438_12 <dbl>
 ```
 
 ### Afterword: Fit Your Model\!
