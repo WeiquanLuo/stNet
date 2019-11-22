@@ -2,7 +2,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom tidyr gather pivot_wider nest
 #' @importFrom dplyr select mutate filter arrange right_join left_join
-#' @importFrom lubridate ymd_hms
+#' @import lubridate
 #' @importFrom sf st_transform
 #' @importFrom stats setNames
 #' @importFrom purrr map_dbl
