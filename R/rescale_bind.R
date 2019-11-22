@@ -1,4 +1,4 @@
-#' combine target and predictor data
+#' combine target and predictor data with rescaling
 #' @importFrom magrittr %>%
 #' @importFrom tidyr gather pivot_wider nest
 #' @importFrom dplyr select mutate filter arrange right_join left_join
@@ -32,12 +32,12 @@
 #'   nest(data = c(target, predictor)); target_data
 #' data <- target_data[which(target_data$county == "boone"), ]$data[[1]]; data
 #' # humboldt for none; allamakee for one; boone for two
-#' agg_cbind(data,
+#' rescale_bind(data,
 #'           date_col = c("Year", "Date"),
 #'           scaling = c("Year","Day"),
 #'           aggMethod = c("mean","max"))
 
-agg_cbind <- function(data = NULL,
+rescale_bind <- function(data = NULL,
                       date_col = c("Year", "Date"),
                       scaling = c("Year","Day"),
                       aggMethod = c("mean","max")){
@@ -45,61 +45,19 @@ agg_cbind <- function(data = NULL,
   # exit function if data is null
   if (is.null(data$predictor[[1]])) return(NULL)
 
-  # interger for lubridate::ymd(truncated)
-  gettruncated <- function(x){
-    if (x == "Year") truncation = 5L
-    if (x == "Month") truncation = 4L
-    if (x == "Day") truncation = 3L
-    if (x == "Date") truncation = 3L
-    if (x == "Hour") truncation = 2L
-    if (x == "Minute") truncation = 1L
-    if (x == "Second") truncation = 0L
-    return(truncation)
-  }
+  # rescale target
+  target <- tempo_rescaling(df = data$target[[1]],
+                            date_col = date_col[1],
+                            indf_scale = scaling[1],
+                            destinate_scale = scaling[1],
+                            aggMethod = aggMethod[1]); target
 
-  # for target
-  target <- data$target[[1]] %>%
-    select(date_col[1]) %>%
-    setNames(c("Date_col")) %>%
-    mutate(Date = Date_col %>% ymd_hms(truncated = gettruncated(date_col[1]))) %>% # extract ymd_hms
-    mutate(join_by = eval(call(paste0("", tolower(scaling[1])), Date))) %>% # extract joinning scale
-    select(join_by, Date, Date_col) %>% # reorder column: join_by, Date, Date_col
-    right_join(data$target[[1]], by = c(Date_col= date_col[1])) %>% # join using Date_col with original data
-    select(-Date, -Date_col); target # remove ymd_hms Date and Date_col
-
-  # for predictor
-  predictor <- data$predictor[[1]] %>%
-    select(date_col[2]) %>%
-    setNames(c("Date_col")) %>%
-    mutate(Date = Date_col %>% ymd_hms(truncated = gettruncated(date_col[2]))) %>% # extract ymd_hms
-    mutate(join_by = eval(call(paste0("", tolower(scaling[1])), Date))) %>% # extract scale for joinning
-    mutate(rescale = eval(call(paste0("", tolower(scaling[2])), Date))) %>% # extract scale for rescaling
-    select(join_by, rescale, Date, Date_col) %>% # reorder column: join_by, Date, Date_col
-    right_join(data$predictor[[1]], by = c(Date_col= date_col[2])) %>% # join using Date_col with original data
-    select(-Date, -Date_col)%>% # remove ymd_hms Date and Date_col
-    gather(key = "id", value = "val", -c(join_by, rescale)) %>%
-    nest(data = val) %>%
-    mutate(statistic = data %>% map_dbl(function(data) {
-      temporal_rescaling(data = data, rescallingMethod = aggMethod[2])
-    })) %>%
-    select(-data); predictor
-
-   if (gettruncated(scaling[1]) <= gettruncated(scaling[2])) {
-     predictor <- predictor %>%
-       select(-rescale) %>%
-       pivot_wider(names_from = c(id),
-                   values_from = statistic,
-                   values_fn = list(statistic = list)); predictor
-   } else {
-     predictor <- predictor %>%
-       pivot_wider(names_from = c(id, rescale),
-                   values_from = statistic,
-                   values_fn = list(statistic = list)); predictor
-   }
-
-  suppressWarnings({
-    predictor <- predictor %>%
-      unnest()})
+  # rescale predictor
+  predictor <- tempo_rescaling( df = data$predictor[[1]],
+                                date_col = date_col[2],
+                                indf_scale = scaling[1],
+                                destinate_scale = scaling[2],
+                                aggMethod = aggMethod[2]);predictor
 
   # combine target & predictor
   data <- target %>%

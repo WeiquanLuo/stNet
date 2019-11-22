@@ -31,10 +31,10 @@ spatio_fuse <- function(target_stN = NULL, data_stN = NULL, parm_nm = "parm_xxx"
     rename(target= data) %>%
     nest(data = c(geometry)) %>% # nest geometry for purrr::map()
     mutate(predictor = map(data, function(pol){ # assign site to each pol
-      suppressWarnings(cropping_cbind(data_stN = data_stN,
+      suppressWarnings(pol_cropping(data_stN = data_stN,
                                       pol = pol,
                                       parm_nm = parm_nm))})) %>%
-    stN_drop_null() %>% # drop the row if the predictor is nullL: no timeseries data in the pol
+    predictor_drop_null() %>% # drop the row if the predictor is nullL: no timeseries data in the pol
     select(-data); target_data_t
 
   return(target_data_t)

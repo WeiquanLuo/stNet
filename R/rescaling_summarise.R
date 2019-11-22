@@ -7,9 +7,9 @@
 #' @examples
 #' data <- c(NA,round(runif(n = 20, min = 0, max = 100)))
 #' rescallingMethod <- "max"
-#' temporal_rescaling(data= data, rescallingMethod = rescallingMethod)
+#' rescaling_summarise(data= data, rescallingMethod = rescallingMethod)
 
-temporal_rescaling <- function(data, rescallingMethod) {
+rescaling_summarise <- function(data, rescallingMethod) {
   if (!is.numeric(data)) data <- flatten(data) %>% unlist
   data <- na.omit(data)
   eval(call(rescallingMethod, c(data, na.rm = TRUE)))

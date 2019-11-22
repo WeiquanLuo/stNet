@@ -26,9 +26,9 @@
 #' parm_nm = "watertem"
 #' plot(st_geometry(pol))
 #' plot(st_geometry(data_stN), add = TRUE)
-#' cropping_cbind(data_stN = water_Temperature_st, pol = pol, parm_nm = "watertem")
+#' pol_cropping(data_stN = water_Temperature_st, pol = pol, parm_nm = "watertem")
 
-cropping_cbind <- function(data_stN = NULL, pol = NULL, parm_nm = "parm_nm"){
+pol_cropping <- function(data_stN = NULL, pol = NULL, parm_nm = "parm_nm"){
 
   cropped_sites <- st_intersection(data_stN, st_make_valid(pol)) %>%
     st_drop_geometry() %>%

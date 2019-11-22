@@ -30,10 +30,10 @@ tempo_fuse <- function(target_data = NULL,
   target_data_fused <- target_data %>%
     nest(data = c(target, predictor)) %>%
     mutate(data = data %>% map(function(data) {
-      agg_cbind(data = data,
-                date_col = date_col,
-                scaling = scaling,
-                aggMethod = aggMethod)}))
+      rescale_bind(data = data,
+                   date_col = date_col,
+                   scaling = scaling,
+                   aggMethod = aggMethod)}))
 
   return(target_data_fused)
 }
