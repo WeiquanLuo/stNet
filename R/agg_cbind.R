@@ -82,14 +82,19 @@ agg_cbind <- function(data = NULL,
     mutate(statistic = data %>% map_dbl(function(data) {
       temporal_rescaling(data = data, rescallingMethod = aggMethod[2])
     })) %>%
-    select(-data) %>%
-    pivot_wider(names_from = c(id, rescale),
-                       values_from = statistic); predictor
+    select(-data)
+
+   if (gettruncated(scaling[1]) >= gettruncated(scaling[2])) {
+     predictor <- predictor %>% select(-rescale); predictor
+   } else {
+     pivot_wider(names_from = c(id, rescale),
+                 values_from = statistic); predictor
+   }
 
   # combine target & predictor
   data <- target %>%
     left_join(predictor, by = "join_by") %>%
-    setnames(new = c(scaling[1]), old = c('join_by'))
+    setnames(new = c(scaling[1]), old = c('join_by')); data
 
   return(data)
 }

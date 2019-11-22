@@ -37,40 +37,72 @@ devtools::install_github("WeiquanLuo/stNet")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows a workflow of using $stNet$ functionality:
 
 ```{r example}
 library(stNet)
-data(weather_tmax_sf)
-data(weather_tmin_sf)
-data(corn_yield_sf)
+# load data
+data(weather_tmax_sf); weather_tmax_st <- weather_tmax_sf # point sf object
+data(weather_tmin_sf); weather_tmin_st <- weather_tmin_sf # point sf object
+data(corn_yield_sf); corn_yield_st <- corn_yield_sf # polygon sf object
+```
 
-corn_yield_st <- corn_yield_sf
-weather_tmin_st <- weather_tmin_sf
-tictoc::tic()
+### Step 1 fuse the spatio heterogeneity: `spatio_fuse()`
+
+```{r spatio_fuse}
 yield_tmin_t <- spatio_fuse(target_stN = corn_yield_st,
                                data_stN = weather_tmin_st,
                                parm_nm = "tmin",
-                               crs = 2163); yield_tmin_t
-tictoc::toc()
-yield_tmin <- tempo_fuse(target_data = yield_tmin_t,
-                          date_col = c("Year", "Date"),
-                          scaling = c("Year","Month"),
-                          aggMethod = c("mean","min")); yield_tmin
+                               crs = 2163)
 
-weather_tmax_st <- weather_tmax_sf
-tictoc::tic()
 yield_tmax_t <- spatio_fuse(target_stN = corn_yield_st,
                                data_stN = weather_tmax_st,
                                parm_nm = "tmax",
-                               crs = 2163); yield_tmax_t
-tictoc::toc()
+                               crs = 2163)
+yield_tmax_t
+yield_tmax_t$target[[1]]
+yield_tmax_t$predictor[[1]]
+```
+
+### Step 2: fuse temporal heterogeneity: `tempo_fuse()`
+
+```{r tempo_fuse}
+yield_tmin <- tempo_fuse(target_data = yield_tmin_t,
+                          date_col = c("Year", "Date"),
+                          scaling = c("Year","Month"),
+                          aggMethod = c("mean","min"))
+
 yield_tmax <- tempo_fuse(target_data = yield_tmax_t,
                           date_col = c("Year", "Date"),
                           scaling = c("Year","Month"),
-                          aggMethod = c("mean","min")); yield_tmax
+                          aggMethod = c("mean","min"))
+yield_tmax
+yield_tmax$data[[1]]
+```
+
+### Step 3: bind multiple homogeneous spatiotemporal data into a single object
+
+If there multiple parameter for the same target varible, we can use `cbind_TargetDatas()` to join them. For example, joining two objects `yield_tmin` and `yield_tmax` by `join_by = "Year"` with anchoring the target varialbe `target = "yield"`:
+
+```{r cbind_TargetDatas}
 
 bind_data <- cbind_TargetDatas(yield_tmin, yield_tmax, 
-                               target = "yield", join_by = "Year")
+                               target = "yield", join_by = "Year"); bind_data; bind_data$data[[1]]
+```
+
+### Afterword: Fit Your Model!
+
+After fusing the spatial and temporal heterogeneity of the data, you can use other generic modeling technique to do analysis. For example:
+
+```{r afterword}
+# fitmodel = lm
+fitmodel <- function(data){
+  model <- lm(yield ~ ., data=data %>% na.omit() %>% dplyr::select(-Year))
+  return(model)
+}
+F_model <- yield_tmin %>%
+  dplyr::mutate(model = data %>% purrr::map(fitmodel)) %>% 
+  dplyr::mutate(statisics = model %>% purrr::map(.f = function(m) broom::glance(m))) %>%
+  tidyr::unnest(statisics); F_model
 ```
 
